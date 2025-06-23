@@ -168,12 +168,13 @@ capacity for the number of requests it can handle per second, the QCO will
 oscillate at a different frequency and time will appear to move faster than it
 should:
 
-<figure class="text-center my-4">
-  <img src="/posts/clock_synchronization/quartz_deviation.png" alt="Deviation Plot" />
+<figure class="my-4 text-center">
+  <img class="mx-auto" src="/posts/clock_synchronization/quartz_deviation.png" alt="Deviation Plot" />
   <figcaption class="text-sm text-secondary mt-2">
     Figure 1: Frequency deviation
   </figcaption>
 </figure>
+
 
 In Linux systems, we can see the name of our hardware clock by looking in the
 `/sys` directory:
@@ -328,12 +329,16 @@ less than 50ppm. I captured all of the values using `chronyc tracking` and a
 systemd timer to have it run every minute.
 
 
-<figure class="text-center my-4">
-  <img src="/posts/clock_synchronization/local_ntp.png" alt="Local NTP Skew" />
-  <figcaption class="text-sm text-secondary mt-2">
-    Figure 3: Local NTP Corrections and Offset
-  </figcaption>
-</figure>
+
+<div class="flex justify-center my-4">
+  <figure class="text-center">
+    <img src="/posts/clock_synchronization/local_ntp.png" alt="Local NTP Skew" />
+    <figcaption class="text-sm text-secondary mt-2">
+      Figure 3: Local NTP Corrections and Offset
+    </figcaption>
+  </figure>
+</div>
+
 
 ### Overview 
 

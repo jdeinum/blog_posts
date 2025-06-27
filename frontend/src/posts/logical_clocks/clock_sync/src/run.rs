@@ -106,6 +106,10 @@ where
             tokio::time::sleep(Duration::from_secs(1)).await;
         }
 
+        // sleep for 2 seconds just to allow all nodes to finish up
+        // NOTE: This is a hack, not a solution
+        tokio::time::sleep(Duration::from_secs(2)).await;
+
         Ok(())
     }
 }

@@ -5,16 +5,16 @@ date: 2025-06-03
 # Logical Clocks
 
 Unlike the monotomic clock and the wall clock, logical clocks are typically fully
-independent of the device clock. They are defined exclusvely in software, and
+independent of the device clock. They are defined exclusively in software, and
 two independent logical clocks cannot be compared in any meaningful way. Logical
 clocks are widely used in distributed systems to determine the relative ordering
 of events, and are often used as Version Vectors. I wrote a simple demo for
 these which you can find
-[here](https://github.com/jdeinum/blog_posts/tree/master/frontend/src/posts).
+[here](https://github.com/jdeinum/blog_posts/tree/master/frontend/src/posts/logical_clocks/clock_sync).
 
 ## Happens Before Relationship
 
-Before we take a look at logical clocks, we should take understand what it means
+Before we take a look at logical clocks, we should understand what it means
 if an event happens before another. If you were to ask a random person on the
 street what this means, you will likely get something like "The time that event
 A happened at is earlier than the time that event B happened". If you read my
@@ -104,7 +104,7 @@ sequenceDiagram
     <table>
       <thead>
         <tr>
-          <th >Point</th>
+          <th >After Receiving</th>
             <th><span class="math-inline">L_A</span></th>
             <th><span class="math-inline">L_B</span></th>
             <th><span class="math-inline">L_C</span></th>
@@ -144,7 +144,7 @@ sequenceDiagram
 
 Lamport clock have several interesting properties. First, they provide 
 
-events *A* and *B*, with lamport timestamps $L_A$ and $L_B$ respecfully, we have
+events *A* and *B*, with lamport timestamps $L_A$ and $L_B$ respectfully, we have
 the following:
 
 1. If $A -> B$ , then $L_A < L_B$
@@ -160,8 +160,8 @@ $M_1$ on node B because you cannot receive a message that was not sent.
 
 (2) states that given two lamport timestamps $L_A$ and $L_B$, if $L_A < L_B$,
 then either A happened before B, or A and B are *concurrent*. Concurrent in this
-case means that we don't actually know which of the two events happened first,
-and also that the events are independent. Events $A_1$ and $B_1$ in figure 2 are
+case means that we don't actually know which of the two events happened first
+and that the events are also independent. Events $A_1$ and $B_1$ in figure 2 are
 concurrent since there is no happens before relationship between them.
 Concurrent events are the reason why we have a partial ordering rather than a
 total ordering. Some events such as those mentioned above do not have an
@@ -335,11 +335,11 @@ sequenceDiagram
 
 Before we talk about comparing vector timestamps, its worth noting that no two
 distinct events in the system will ever share the same vector timestamp. This
-means if two events share the same vector timestamp, they must be the same
+means that if two events share the same vector timestamp, they must be the same
 event. However, as you'll see, this fact alone does not provide a total ordering
 of the events. In addition to thinking of a vector clock as a timestamp, you can
 also think of the vector timestamp as a set of events. Each event $e$ is the set
-that contains $e$ and all of its causal dependencies $d$ (any event that
+that contains $e$ and all of its causal dependencies $d$ ( i.e any event that
 happened before $e$). Any event that can be reached moving backwards in time in
 a sequence diagram starting at some event $e$ forms its causal dependency set
 $d$. Consider the receival of message 4, which has the vector timestamp of
@@ -383,23 +383,27 @@ Interval Clocks](http://gsd.di.uminho.pt/members/cbm/ps/itc2008.pdf).
 
 #### Handling Concurrent Writes
 
-```mermaid
-sequenceDiagram
-    participant Client 1
-    participant A
-    participant B
-    participant Client 2
-    autonumber
-    
-    par M1
-    Client 1 ->> B: <t0, k1, v1>
-    Client 1 ->> A: <t0, k1, v1>
-    end
-    par M2 
-    Client 2 ->> A: <t0, k1, v1>
-    Client 2 ->> B: <t0, k1, v2>
-    end
-```
+<div style="display: flex; justify-content: center; align-items: center;">
+  <figure class="mermaid-diagram">
+    <pre class="mermaid">
+    sequenceDiagram
+        participant Client 1
+        participant A
+        participant B
+        participant Client 2
+        autonumber
+        par M1
+        Client 1 ->> B: {t0, k1, v1}
+        Client 1 ->> A: {t0, k1, v1}
+        end
+        par M2
+        Client 2 ->> A: {t0, k1, v1}
+        Client 2 ->> B: {t0, k1, v2}
+        end
+    </pre>
+    <figcaption>Figure 3: Concurrent Writes M1 and M2</figcaption>
+  </figure>
+</div>
 
 One way logical timestamps are used in database systems is in handling
 concurrent writes to a replicated system. Consider figure 3, which shows two
@@ -411,7 +415,7 @@ different replicas. Consider the following ordering of messages:
 3. A receives M2 then M1, while B receives M1 then M2
 4. A receives M1 then M2, while B receives M2 then M1
 
-If we disreguarded timestamps in the messages, and just applied the messages in
+If we disreguard the timestamps in the messages, and just applied the messages in
 the order we receive them, then cases (1) and (2) result in a consistent state,
 while cases (3) and (4) result in an inconsistent state. Since replication by
 definition requires the nodes to be identical, this isn't sufficient.  
@@ -421,8 +425,8 @@ can define a total ordering of the events in our system, and keep only the value
 for the key containing the greater timestamp. Remember however, that $L_A < L_B$
 does not mean that event A happened before event B, as the events could be
 concurrent. This means that even if B happened after A according to an observer
-of the system, it may silently discard the value of event B because the lamport
-timestamp for A was greater.  
+of the system, it may silently discard the value of event M2 because the lamport
+timestamp for M1 was greater.  
 
 If the data loss associated with lamport timestamps is unacceptable, we can
 instead use vector clocks alongside changing how we store the value in our
@@ -439,3 +443,12 @@ database, it is read only and can safely be read without locking. This is one of
 the strategies used by [Spanner](https://cloud.google.com/spanner) for
 maintaining consistent snapshots.
 
+# Sources 
+
+- [Designing Data Intensive
+Applications](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/)
+by the goat Martin Kleppmann  
+- [Patterns of Distributed
+Systems](https://martinfowler.com/articles/patterns-of-distributed-systems/) by
+Unmesh Joshi  
+- [Wiki](https://en.wikipedia.org/wiki/Vector_clock)  

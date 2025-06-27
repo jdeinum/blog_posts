@@ -2,4 +2,4 @@
 
 Normally just some problems or concepts I find interesting :)
 
-Hosted at [nullspaces.io](nullspaces.io)
+Hosted at [nullspaces.io](https://nullspaces.io)
